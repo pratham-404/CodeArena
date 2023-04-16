@@ -12,7 +12,7 @@ compiler.init(options)
 app.use('/codemirror-5.65.12', express.static("./codemirror-5.65.12"))
 
 app.get("/", function(req, res){
-  res.sendFile("./temp.html", { root: '.' });
+  res.sendFile("./v2.html", { root: '.' });
 })
 
 app.post("/compile", function(req, res){
@@ -21,12 +21,12 @@ app.post("/compile", function(req, res){
   var lang = req.body.lang
   var osys = req.body.os
 
-  try {
-    // free temp dir 
-    compiler.flush(function(){
-      console.log("Files Deleted")
-    });
+  // free temp dir 
+  compiler.flush(function(){
+    console.log("Files Deleted")
+  });
 
+  try {
     function handleCompilerOutput(data) {
         if (data.output) {
           res.send(data);
