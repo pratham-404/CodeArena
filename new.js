@@ -1,8 +1,9 @@
 const express = require("express")
+const bodyParser = require("body-parser")
+
 const app = express()
 
-const bodyP = require("body-parser")
-app.use(bodyP.json())
+app.use(bodyParser.json())
 
 const compiler = require("compilex")
 
@@ -11,7 +12,19 @@ compiler.init(options)
 
 app.use('/codemirror-5.65.12', express.static("./codemirror-5.65.12"))
 
-app.get("/", function(req, res){
+app.post('/', (req, res) => {
+  const data = req.body;
+  console.log(`Problem name: ${data.name}`);
+  console.log(`Problem group: ${data.group}`);
+  console.log('Full body:');
+  console.log(JSON.stringify(data, null, 4));
+
+  console.log('Visit: http://localhost:10043/app');
+
+  res.sendStatus(200);
+});
+
+app.get("/app", function(req, res){
   res.sendFile("./v2.html", { root: '.' });
 })
 
@@ -68,4 +81,15 @@ app.post("/compile", function(req, res){
   }
 });
 
-app.listen(10043)
+app.listen(10043, err => {
+  console.log(`Listening on port 10043`);
+});
+
+
+
+
+
+
+
+
+
