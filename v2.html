@@ -7,28 +7,30 @@
 		<title>Document</title>
 
 		<!-- Bootstrap CDN -->
-		<link rel="stylesheet" href="https://bootswatch.com/5/lux/bootstrap.min.css">
-		<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous" /> -->
+		<link rel="stylesheet" href="./static/css/bootstrap.min.css">
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
 
 		<!-- CodeMirror -->
-		<link rel="stylesheet" href="./codemirror-5.65.12/lib/codemirror.css" />
-		<script type="text/javascript" src="./codemirror-5.65.12/lib/codemirror.js"></script>
+		<link rel="stylesheet" href="./static/css/codemirror/codemirror.css" />
+		<script type="text/javascript" src="./static/js/codemirror.js"></script>
 
 		<!-- Languages -->
-		<script type="text/javascript" src="./codemirror-5.65.12/mode/clike/clike.js"></script>
-		<script type="text/javascript" src="./codemirror-5.65.12/mode/python/python.js"></script>
+		<script type="text/javascript" src="./static/js/lang/clike.js"></script>
+		<script type="text/javascript" src="./static/js/lang/python.js"></script>
 
 		<!-- Themes -->
-		<link rel="stylesheet" href="./codemirror-5.65.12/theme/ayu-mirage.css" />
-		<link rel="stylesheet" href="./codemirror-5.65.12/theme/dracula.css" />
-		<link rel="stylesheet" href="./codemirror-5.65.12/theme/material-palenight.css" />
-		<link rel="stylesheet" href="./codemirror-5.65.12/theme/monokai.css" />
-		<link rel="stylesheet" href="./codemirror-5.65.12/theme/nord.css" />
-		<link rel="stylesheet" href="./codemirror-5.65.12/theme/vscode-dark.css" />
+		<link rel="stylesheet" href="./static/css/codemirror/theme/ayu-mirage.css" />
+		<link rel="stylesheet" href="./static/css/codemirror/theme/dracula.css" />
+		<link rel="stylesheet" href="./static/css/codemirror/theme/material-palenight.css" />
+		<link rel="stylesheet" href="./static/css/codemirror/theme/monokai.css" />
+		<link rel="stylesheet" href="./static/css/codemirror/theme/nord.css" />
+		<link rel="stylesheet" href="./static/css/codemirror/theme/vscode-dark.css" />
 
 		<!-- Addons -->
-		<script type="text/javascript" src="./codemirror-5.65.12/addon/edit/closebrackets.js"></script>
+		<script type="text/javascript" src="./static/js/addons/closebrackets.js"></script>
+		<link rel="stylesheet" href="./static/js/addons/show-hint.css">
+		<script src="./static/js/addons/show-hint.js"></script>
+		<script src="./static/js/addons/comment.js"></script>
 
 		<style>
 			.form-control:focus {
@@ -120,8 +122,14 @@
 		var editor = CodeMirror.fromTextArea(textarea, {
 			mode: lang_dict[current_lang][0],
 			theme: current_thm,
+			indentUnit: 4,
+			smartIndent: true,
 			lineNumbers: true,
 			autoCloseBrackets: true,
+			extraKeys: {
+				'Ctrl-Space': 'autocomplete',
+				'Ctrl-/': 'toggleComment',
+			},
 		});
 
 		var width = window.innerWidth;
@@ -212,7 +220,7 @@
 						os: current_os,
 					};
 				
-					var op = await fetch("http://localhost:8000/compile", {
+					var op = await fetch("http://localhost:10043/compile", {
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
