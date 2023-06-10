@@ -1,62 +1,9 @@
+text-box height 
 
 
-testcase no.
-new button
-
-scrollbar for testcase overflow
-
-codemirror addons
+runall functionnality 
 
 
-
-
-
-
-<div class="accordion-item border border-0 mb-2 testcase ">
-	<div class="accordion-header d-flex justify-content-between border bg-light-subtle">
-		<button class="accordion-button bg-light-subtle border border-0 *****" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapse ||||||">Testcase ||||||</button>
-    </div>
-    <div id="panelsStayOpen-collapse ||||||" class="box accordion-collapse collapse show *****|"">
-        <div>
-            <label class="mb-1">Input</label>
-            <textarea type="text" class="form-control"></textarea>
-        </div>
-        <div>
-            <label class="mb-1">Expected Output</label>
-            <textarea type="text" class="form-control"></textarea>
-        </div>
-        <div>
-            <label class="mb-1">Received Output</label>
-            <textarea type="text" class="form-control" readonly></textarea>
-        </div>
-    </div>
-</div>
-
-
-
-
-<div class="accordion-item border border-0 mb-2 testcase ">
-	<div class="accordion-header d-flex justify-content-between border bg-light-subtle">
-		<button class="accordion-button bg-light-subtle border border-0 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapse2">Testcase 2</button> 
-	</div>
-	<div id="panelsStayOpen-collapse2" class="box accordion-collapse collapse">
-		<div>
-			<label class="mb-1">Input</label>
-			<textarea type="text" class="form-control"></textarea>
-		</div>
-		<div>
-			<label class="mb-1">Expected Output</label>
-			<textarea type="text" class="form-control"></textarea>
-		</div>
-		<div>
-			<label class="mb-1">Received Output</label>
-			<textarea type="text" class="form-control" readonly></textarea>
-		</div>
-	</div>
-</div>
-
-
-
-
+parsing testcases from the port and fireing-up a tab having the tetcases for the problem
 
 
