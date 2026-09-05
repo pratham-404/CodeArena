@@ -15,7 +15,6 @@
     "node": ">=18"
   },
   "dependencies": {
-    "codearena": "file:..",
     "pyright": "1.1.413",
     "ws": "8.21.3"
   }
