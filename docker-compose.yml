@@ -1,0 +1,45 @@
+services:
+  backend:
+    build: ./backend
+    environment:
+      ALLOWED_ORIGINS: ${PUBLIC_ORIGIN:-http://localhost:8080}
+      COMPILATION_TIMEOUT_MS: 10000
+      EXECUTION_TIMEOUT_MS: 3000
+      LSP_IDLE_MS: 300000
+      MAX_LSP_SESSIONS: 20
+    expose:
+      - "8000"
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+    read_only: true
+    tmpfs:
+      - /tmp:size=512m,mode=1777,exec
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 256
+    mem_limit: 2g
+    cpus: 2.0
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/api/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${PORT:-8080}:8080"
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped

@@ -1,2 +1,6 @@
 node_modules/
-temp/
+dist/
+.npm-cache/
+.npm-cache-public/
+.cph/
+*.log

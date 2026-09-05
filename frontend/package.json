@@ -1,0 +1,21 @@
+{
+  "name": "codearena-frontend",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "monaco-editor": "0.56.0"
+  },
+  "devDependencies": {
+    "vite": "6.4.3"
+  },
+  "overrides": {
+    "dompurify": "3.4.14"
+  }
+}
