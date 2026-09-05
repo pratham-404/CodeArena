@@ -5,6 +5,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
+    "local": "node src/server.js --local",
     "dev": "node --watch src/server.js",
     "test": "node --test test/api.test.js test/executor.test.js test/lsp-process.test.js",
     "test:live-lsp": "node --test test/live-lsp.test.js",
@@ -14,6 +15,7 @@
     "node": ">=18"
   },
   "dependencies": {
+    "codearena": "file:..",
     "pyright": "1.1.413",
     "ws": "8.21.3"
   }

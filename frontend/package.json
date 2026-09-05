@@ -10,6 +10,7 @@
     "test": "node --test"
   },
   "dependencies": {
+    "codearena": "file:..",
     "monaco-editor": "0.56.0"
   },
   "devDependencies": {

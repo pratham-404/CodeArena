@@ -64,6 +64,15 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, summary:focu
   font-size: 18px;
 }
 .icon-button:hover { background: #2a2d2e; }
+.runner-toggle { min-height: 32px; padding: 2px; display: flex; border: 1px solid var(--border); border-radius: 4px; background: var(--panel-2); color: var(--muted); }
+.runner-symbol { width: 28px; height: 26px; display: grid; place-items: center; border-radius: 3px; }
+.runner-symbol svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+.runner-toggle[data-mode="local"] [data-runner-symbol="local"] { background: #234423; color: var(--green); }
+.runner-toggle[data-mode="sandbox"] [data-runner-symbol="sandbox"] { background: #083d55; color: #4fc1ff; }
+.runner-toggle:hover:not(:disabled) { background: #2a2d2e; }
+.runner-status { max-width: 280px; overflow: hidden; color: var(--muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.runner-status[data-status="ready"] { color: var(--green); }
+.runner-status[data-status="error"] { color: var(--red); }
 select, .secondary, .run-button {
   border: 1px solid var(--border);
   border-radius: 3px;
@@ -90,10 +99,7 @@ select, .secondary, .run-button {
 }
 .pane-title { font-size: 13px; font-weight: 600; }
 .editor-meta { display: flex; align-items: center; gap: 12px; }
-.shortcut, .language-service, .test-summary { color: var(--muted); font-size: 12px; }
-.language-service[data-status="ready"] { color: var(--green); }
-.language-service[data-status="starting"] { color: #cca700; }
-.language-service[data-status="error"] { color: var(--red); }
+.shortcut, .test-summary { color: var(--muted); font-size: 12px; }
 kbd { border: 1px solid var(--border); border-radius: 3px; padding: 1px 4px; background: var(--panel); }
 
 .test-pane {
@@ -182,6 +188,7 @@ kbd { border: 1px solid var(--border); border-radius: 3px; padding: 1px 4px; bac
   .toolbar { width: 100%; }
   .toolbar label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
   .toolbar select { flex: 1; }
+  .runner-status { max-width: 190px; }
   .workspace { grid-template-columns: 1fr; grid-template-rows: minmax(500px, 60vh) minmax(420px, auto); }
   .test-pane { border-right: 0; border-bottom: 1px solid var(--border); }
   .test-list { max-height: 65vh; }

@@ -11,17 +11,18 @@ import "monaco-editor/editor/contrib/indentation/browser/indentation.js";
 import "monaco-editor/editor/contrib/parameterHints/browser/parameterHints.js";
 import "monaco-editor/editor/contrib/snippet/browser/snippetController2.js";
 import "monaco-editor/editor/contrib/suggest/browser/suggestController.js";
-import "./styles.css";
-import { LANGUAGES, loadCode, loadTestCases, outputsMatch, storageKey, testCaseStorageKey } from "./config.js";
+import { LANGUAGES, loadCode, loadTestCases, outputsMatch, resetTestCases, storageKey, testCaseStorageKey } from "./config.js";
 import { LspClient, registerLanguageFeatures, setDiagnostics } from "./lsp-client.js";
 import { registerSnippets } from "./snippets.js";
+import { isRunShortcut, preferredMode, preferredServiceMode, runnerUrl } from "./runner.js";
 
 self.MonacoEnvironment = { getWorker: () => new EditorWorker() };
 
 const languageSelect = document.querySelector("#language");
 const filename = document.querySelector("#filename");
 const resetButton = document.querySelector("#reset");
-const languageService = document.querySelector("#language-service");
+const runnerToggle = document.querySelector("#runner-toggle");
+const runnerStatus = document.querySelector("#runner-status");
 const testCasesElement = document.querySelector("#test-cases");
 const testSummary = document.querySelector("#test-summary");
 const addTestButton = document.querySelector("#add-test");
@@ -37,6 +38,11 @@ let language = languageSelect.value;
 let activeClient;
 let changeSubscription;
 let running = false;
+let executionMode = "sandbox";
+const runnerAvailability = {
+  local: { available: false, error: "Local runner is not running." },
+  sandbox: { available: false, error: "Sandbox is not available." },
+};
 
 const editor = monaco.editor.create(document.querySelector("#editor"), {
   model: models.get(language),
@@ -69,19 +75,18 @@ for (const [modelLanguage, model] of models) {
   });
 }
 
-function setLanguageServiceStatus(state, text) {
-  languageService.dataset.status = state;
-  languageService.textContent = text;
-}
-
 async function connectLanguageService() {
   changeSubscription?.dispose();
   activeClient?.dispose();
   const model = editor.getModel();
+  const serviceMode = preferredServiceMode(runnerAvailability);
+  if (!serviceMode) {
+    setDiagnostics(monaco, model, []);
+    return;
+  }
   const client = activeClient = new LspClient(language, model, {
-    status: setLanguageServiceStatus,
     diagnostics: (diagnostics) => setDiagnostics(monaco, model, diagnostics),
-  });
+  }, runnerUrl(serviceMode, "/"));
   try {
     await client.connect();
     if (client !== activeClient) return client.dispose();
@@ -106,8 +111,9 @@ function updateTestSummary() {
   testSummary.textContent = `${passed} / ${testCases.length} passed`;
   languageSelect.disabled = running;
   resetButton.disabled = running;
+  runnerToggle.disabled = running || !runnerAvailability[executionMode === "local" ? "sandbox" : "local"].available;
   addTestButton.disabled = running;
-  runButton.disabled = running || testCases.length === 0;
+  runButton.disabled = running || testCases.length === 0 || !runnerAvailability[executionMode].available;
   runButton.textContent = running ? "Running…" : "Run all";
 }
 
@@ -180,18 +186,73 @@ resetButton.addEventListener("click", () => {
   const model = editor.getModel();
   if (model.getValue() !== LANGUAGES[language].code && !window.confirm("Reset this language to its starter code?")) return;
   model.setValue(LANGUAGES[language].code);
-  for (const testCase of currentTestCases()) Object.assign(testCase, { status: "idle", actual: "", error: "", resultStatus: null, durationMs: null });
+  testCasesByLanguage.set(language, resetTestCases(language, localStorage).map((testCase) => ({
+    ...testCase, status: "idle", actual: "", error: "", resultStatus: null, durationMs: null, open: true,
+  })));
   renderTestCases();
   editor.focus();
+});
+
+function renderRunner() {
+  const selected = runnerAvailability[executionMode];
+  const otherMode = executionMode === "local" ? "sandbox" : "local";
+  const other = runnerAvailability[otherMode];
+  const selectedName = executionMode === "local" ? "Local" : "Sandbox";
+  const otherName = otherMode === "local" ? "Local" : "Sandbox";
+  runnerToggle.dataset.mode = executionMode;
+  runnerToggle.setAttribute("aria-label", `Switch from ${selectedName} to ${otherName}`);
+  runnerToggle.title = other.available ? `Switch to ${otherName}` : other.error;
+  runnerStatus.dataset.status = selected.available ? "ready" : "error";
+  runnerStatus.textContent = selected.available
+    ? `${selectedName} ready · ${other.available ? `${otherName} ready` : `${otherName} unavailable`}`
+    : selected.error;
+  runnerStatus.title = runnerStatus.textContent;
+  updateTestSummary();
+}
+
+async function checkRunner(mode) {
+  try {
+    const response = await fetch(runnerUrl(mode, "/api/health"), {
+      cache: "no-store",
+      signal: AbortSignal.timeout(3_000),
+      ...(mode === "local" ? { targetAddressSpace: "loopback" } : {}),
+    });
+    const result = await response.json().catch(() => { throw new Error("No runner answered at this address."); });
+    if (!response.ok || !["ok", "available"].includes(result.status)) throw new Error(result.error || `${mode} runner is unavailable.`);
+    runnerAvailability[mode] = { available: true, error: "" };
+  } catch (error) {
+    runnerAvailability[mode] = {
+      available: false,
+      error: mode === "local"
+        ? `Local unavailable — ${error.message || "start it with npm run local"}`
+        : `Sandbox unavailable — ${error.message || "start Docker"}`,
+    };
+  }
+}
+
+async function initializeRunners() {
+  await Promise.all([checkRunner("local"), checkRunner("sandbox")]);
+  executionMode = preferredMode(runnerAvailability);
+  renderRunner();
+  connectLanguageService();
+}
+
+runnerToggle.addEventListener("click", () => {
+  const nextMode = executionMode === "local" ? "sandbox" : "local";
+  if (running || !runnerAvailability[nextMode].available) return;
+  executionMode = nextMode;
+  renderRunner();
+  connectLanguageService();
 });
 
 async function executeTest(testCase, runLanguage, code) {
   let result;
   try {
-    const response = await fetch("/api/execute", {
+    const response = await fetch(runnerUrl(executionMode, "/api/execute"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ language: runLanguage, code, stdin: testCase.input }),
+      ...(executionMode === "local" ? { targetAddressSpace: "loopback" } : {}),
     });
     result = await response.json();
   } catch {
@@ -290,7 +351,11 @@ addTestButton.addEventListener("click", () => {
 });
 
 runButton.addEventListener("click", runAll);
-editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, runAll);
+window.addEventListener("keydown", (event) => {
+  if (!isRunShortcut(event)) return;
+  event.preventDefault();
+  runAll();
+}, { capture: true });
 window.addEventListener("beforeunload", () => activeClient?.dispose());
 renderTestCases();
-connectLanguageService();
+initializeRunners();

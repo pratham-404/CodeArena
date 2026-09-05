@@ -37,6 +37,26 @@ test("execution results retain the API contract", async () => {
   });
 });
 
+test("localhost runner allows its page and rejects other websites", async () => {
+  let called = false;
+  const app = createServer({
+    execute: async () => { called = true; },
+    allowedOrigins: "https://pratham-404.github.io",
+    requireAllowedOrigin: true,
+  });
+  await withServer(app, async (baseUrl) => {
+    const health = await fetch(`${baseUrl}/api/health`, { headers: { Origin: "https://pratham-404.github.io" } });
+    assert.equal(health.headers.get("access-control-allow-origin"), "https://pratham-404.github.io");
+    const rejected = await fetch(`${baseUrl}/api/execute`, {
+      method: "POST",
+      headers: { Origin: "https://example.com", "Content-Type": "application/json" },
+      body: JSON.stringify({ language: "python", code: "print(1)" }),
+    });
+    assert.equal(rejected.status, 403);
+    assert.equal(called, false);
+  });
+});
+
 test("same-origin WebSocket connections receive an LSP session", async () => {
   let selectedLanguage;
   const app = createServer({
