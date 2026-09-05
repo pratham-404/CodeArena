@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Write and run C, C++, Java, and Python in the browser.">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./src/styles.css">
     <title>CodeArena · Online compiler</title>
   </head>
   <body>
@@ -26,6 +27,15 @@
             <option value="python">Python 3</option>
           </select>
           <button class="icon-button" id="reset" type="button" aria-label="Reset" title="Reset"><span aria-hidden="true">↻</span></button>
+          <button class="runner-toggle" id="runner-toggle" type="button" aria-label="Switch execution environment" title="Switch execution environment">
+            <span class="runner-symbol" data-runner-symbol="local" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"></rect><path d="M8 21h8M12 17v4"></path></svg>
+            </span>
+            <span class="runner-symbol" data-runner-symbol="sandbox" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3 20 7v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+            </span>
+          </button>
+          <span class="runner-status" id="runner-status" data-status="checking" aria-live="polite">Checking runners…</span>
         </div>
       </header>
 
@@ -46,7 +56,6 @@
           <div class="pane-header">
             <span class="pane-title" id="filename">main.cpp</span>
             <span class="editor-meta">
-              <span class="language-service" id="language-service" data-status="starting">IntelliSense starting…</span>
               <span class="shortcut"><kbd>Ctrl</kbd> + <kbd>Space</kbd> suggestions · <kbd>Ctrl</kbd> + <kbd>Enter</kbd> run</span>
             </span>
           </div>

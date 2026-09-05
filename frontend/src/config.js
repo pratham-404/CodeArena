@@ -8,7 +8,7 @@ export const LANGUAGES = Object.freeze({
   cpp: {
     id: "cpp",
     filename: "main.cpp",
-    code: '#include <bits/stdc++.h>\n\nusing namespace std;\n\nint main() {\n    string name;\n\n    cin >> name;\n    cout << "Hello, " << name << endl;\n\n    return 0;\n}\n',
+    code: '#include <bits/stdc++.h>\n\nusing namespace std;\n\nint main() {\n    string name;\n\n    cin >> name;\n    cout << "Hello, " << name << "!" << endl;\n\n    return 0;\n}\n',
     testCases: [{ input: "World", expected: "Hello, World!" }],
   },
   java: {
@@ -46,6 +46,11 @@ export function loadTestCases(language, storage) {
     const saved = JSON.parse(storage.getItem(testCaseStorageKey(language)) || "null");
     if (Array.isArray(saved) && saved.every((testCase) => typeof testCase?.input === "string" && typeof testCase.expected === "string")) return saved;
   } catch { /* Use the starter test case. */ }
+  return LANGUAGES[language].testCases.map((testCase) => ({ ...testCase }));
+}
+
+export function resetTestCases(language, storage) {
+  try { storage.removeItem(testCaseStorageKey(language)); } catch { /* Storage can be disabled. */ }
   return LANGUAGES[language].testCases.map((testCase) => ({ ...testCase }));
 }
 

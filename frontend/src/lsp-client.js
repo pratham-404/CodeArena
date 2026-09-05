@@ -1,15 +1,16 @@
-function webSocketUrl(language) {
-  const url = new URL("/lsp", window.location.href);
+function webSocketUrl(language, baseUrl) {
+  const url = new URL("/lsp", baseUrl || window.location.href);
   url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
   url.searchParams.set("language", language);
   return url;
 }
 
 export class LspClient {
-  constructor(language, model, handlers = {}) {
+  constructor(language, model, handlers = {}, baseUrl) {
     this.language = language;
     this.model = model;
     this.handlers = handlers;
+    this.baseUrl = baseUrl;
     this.pending = new Map();
     this.nextId = 1;
     this.ready = false;
@@ -17,7 +18,7 @@ export class LspClient {
 
   connect() {
     return new Promise((resolve, reject) => {
-      const socket = this.socket = new WebSocket(webSocketUrl(this.language));
+      const socket = this.socket = new WebSocket(webSocketUrl(this.language, this.baseUrl));
       const fail = (message) => {
         if (!this.ready) reject(new Error(message));
         this.handlers.status?.("error", message);

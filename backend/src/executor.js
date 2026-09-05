@@ -140,4 +140,21 @@ async function executeCode({ language, code, stdin }) {
   }
 }
 
-module.exports = { executeCode, runProcess };
+async function smokeTestToolchains(execute = executeCode) {
+  const samples = {
+    c: '#include <stdio.h>\nint main(void) { puts("ready"); }',
+    cpp: '#include <iostream>\nint main() { std::cout << "ready\\n"; }',
+    java: 'public class Main { public static void main(String[] args) { System.out.println("ready"); } }',
+    python: 'print("ready")',
+  };
+  const entries = [];
+  for (const [language, code] of Object.entries(samples)) {
+    const result = await execute({ language, code, stdin: "" });
+    entries.push([language, result.status === "success" && result.stdout.trim() === "ready"
+      ? { available: true }
+      : { available: false, error: result.error || result.stderr || `${language} smoke test failed.` }]);
+  }
+  return Object.fromEntries(entries);
+}
+
+module.exports = { executeCode, runProcess, smokeTestToolchains };
