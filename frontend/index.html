@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Write and run C, C++, Java, and Python in the browser.">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <title>CodeArena · Online compiler</title>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">&lt;/&gt;</span>
+          <div>
+            <h1>CodeArena</h1>
+            <p>Compile. Run. Learn.</p>
+          </div>
+        </div>
+        <div class="toolbar">
+          <label for="language">Language</label>
+          <select id="language" aria-label="Programming language">
+            <option value="c">C (C11)</option>
+            <option value="cpp" selected>C++ (C++17)</option>
+            <option value="java">Java</option>
+            <option value="python">Python 3</option>
+          </select>
+          <button class="icon-button" id="reset" type="button" aria-label="Reset" title="Reset"><span aria-hidden="true">↻</span></button>
+        </div>
+      </header>
+
+      <section class="workspace" aria-label="Code workspace">
+        <aside class="test-pane" aria-label="Test cases">
+          <div class="pane-header">
+            <span class="pane-title">Test cases</span>
+            <span class="test-summary" id="test-summary" aria-live="polite">0 / 0 passed</span>
+          </div>
+          <div class="test-list" id="test-cases"></div>
+          <div class="test-actions">
+            <button class="secondary" id="add-test" type="button">+ Add test case</button>
+            <button class="run-button" id="run-all" type="button">Run all</button>
+          </div>
+        </aside>
+
+        <section class="editor-pane" aria-label="Code editor">
+          <div class="pane-header">
+            <span class="pane-title" id="filename">main.cpp</span>
+            <span class="editor-meta">
+              <span class="language-service" id="language-service" data-status="starting">IntelliSense starting…</span>
+              <span class="shortcut"><kbd>Ctrl</kbd> + <kbd>Space</kbd> suggestions · <kbd>Ctrl</kbd> + <kbd>Enter</kbd> run</span>
+            </span>
+          </div>
+          <div id="editor" aria-label="Source code editor"></div>
+        </section>
+      </section>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
